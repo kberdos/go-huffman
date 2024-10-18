@@ -1,3 +1,3 @@
-package encode
+package tree
 
 type EncodingTree struct{}
