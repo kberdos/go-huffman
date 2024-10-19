@@ -14,6 +14,10 @@ func New() *MinHeap {
 	return &MinHeap{}
 }
 
+func (h *MinHeap) Len() int {
+	return len(h.items)
+}
+
 func (h *MinHeap) String() string {
 	out := "Heap Items:\n"
 	for _, item := range h.items {
@@ -39,7 +43,6 @@ func (h *MinHeap) Pop() HeapItem {
 	if len(h.items) > 0 {
 		h.delete_heapify(0)
 	}
-	fmt.Println(len(h.items))
 	return item
 }
 
