@@ -14,6 +14,10 @@ func NewLeaf(b byte, c uint64) *LeafNode {
 	}
 }
 
+func (node *LeafNode) Val() uint64 {
+	return node.Freq
+}
+
 func (node *LeafNode) String() string {
 	return fmt.Sprintf("Char: %c, Count: %d", node.Value, node.Freq)
 }
