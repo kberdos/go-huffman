@@ -8,11 +8,14 @@ import (
 )
 
 func main() {
-	nodes := parse.Parse("hello!")
+	nodes := parse.Parse("abbaacc !acb")
 	heap := heap.New()
 	for _, n := range nodes {
-		fmt.Println(n)
 		heap.Push(n)
 	}
-	fmt.Println(heap)
+
+	for item := heap.Pop(); item != nil; {
+		fmt.Println(item)
+		item = heap.Pop()
+	}
 }
