@@ -1,13 +1,34 @@
 package encode
 
 import (
+	"encoding/binary"
+	"encoding/json"
+	"os"
+
 	"go-huffman/pkg/heap"
 	"go-huffman/pkg/parse"
 	"go-huffman/pkg/tree"
+
+	bitio "github.com/kberdos/go-bitio"
 )
 
-func Encode(msg string) string { // for now does strings
-	nodes := parse.Parse(msg)
+// compresses the src file to the dst file
+func Encode(src, dst string) error {
+	file, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	fileinfo, err := file.Stat()
+	if err != nil {
+		return err
+	}
+	inbuffer := make([]byte, fileinfo.Size())
+	_, err = file.Read(inbuffer)
+	if err != nil {
+		return err
+	}
+
+	nodes := parse.Parse(inbuffer)
 	heap := heap.New()
 
 	// make heap
@@ -26,25 +47,49 @@ func Encode(msg string) string { // for now does strings
 
 	// todo handle edge case of 0 or one nodes
 
-	table := make(map[byte]string)
-	traverse(heap.Pop().(tree.Node), "", table)
+	table := make(map[byte]encoding)
+	traverse(heap.Pop().(tree.Node), encoding{0, 0}, table)
 
-	encoded := ""
-	for _, b := range msg {
-		encoded += table[byte(b)]
+	outfile, err := os.Create(dst)
+	if err != nil {
+		return err
 	}
-	return encoded
+	// TODO: marshal the map to put first
+
+	// uint8 tablesize | table | encoding
+	tablebytes, err := json.Marshal(table)
+	if err != nil {
+		return err
+	}
+	sizebuf := make([]byte, 8)
+	binary.BigEndian.PutUint64(sizebuf, uint64(len(tablebytes)))
+	tablebytes = append(sizebuf, tablebytes...)
+	_, err = outfile.Write(tablebytes)
+	if err != nil {
+		return err
+	}
+
+	bw := bitio.NewWriter(outfile)
+
+	for _, b := range inbuffer {
+		bw.WriteBits(table[b].R, table[b].N)
+	}
+	err = bw.Close()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func traverse(node tree.Node, str string, table map[byte]string) {
+func traverse(node tree.Node, enc encoding, table map[byte]encoding) {
 	if node == nil {
 		return
 	}
 	switch n := node.(type) {
 	case *tree.InternalNode:
-		traverse(n.Left, str+"0", table)
-		traverse(n.Right, str+"1", table)
+		traverse(n.Left, enc.push0(), table)
+		traverse(n.Right, enc.push1(), table)
 	case *tree.LeafNode:
-		table[n.Value] = str
+		table[n.Value] = enc
 	}
 }

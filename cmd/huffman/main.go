@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	println(encode.Encode("abbcccdddd"))
+	encode.Encode("../../testfiles/small", "/tmp/out")
 }

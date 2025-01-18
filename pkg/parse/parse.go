@@ -5,13 +5,13 @@ import (
 )
 
 // Parse a msg into leaf nodes
-func Parse(msg string) []tree.Node {
-	bmap := make(map[byte]uint64)
-	for _, b := range []byte(msg) {
-		bmap[b] += 1
+func Parse(msg []byte) []tree.Node {
+	bytemap := make(map[byte]uint64)
+	for _, b := range msg {
+		bytemap[b] += 1
 	}
 	out := make([]tree.Node, 0)
-	for b, c := range bmap {
+	for b, c := range bytemap {
 		out = append(out, tree.NewLeaf(b, c))
 	}
 	return out
