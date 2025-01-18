@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	encode.Encode("../../testfiles/small", "/tmp/out")
+	encode.Encode("../../testfiles/3mb.txt", "/tmp/out")
 }
