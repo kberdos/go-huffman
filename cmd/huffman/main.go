@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	encode.Encode("abbcccdddd")
+	println(encode.Encode("abbcccdddd"))
 }
