@@ -54,9 +54,8 @@ func Encode(src, dst string) error {
 	if err != nil {
 		return err
 	}
-	// TODO: marshal the map to put first
 
-	// uint8 tablesize | table | encoding
+	// tablesize (uint64) | table | encoding
 	tablebytes, err := json.Marshal(table)
 	if err != nil {
 		return err
@@ -64,6 +63,7 @@ func Encode(src, dst string) error {
 	sizebuf := make([]byte, 8)
 	binary.BigEndian.PutUint64(sizebuf, uint64(len(tablebytes)))
 	tablebytes = append(sizebuf, tablebytes...)
+
 	_, err = outfile.Write(tablebytes)
 	if err != nil {
 		return err

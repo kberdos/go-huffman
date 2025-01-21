@@ -5,5 +5,12 @@ import (
 )
 
 func main() {
-	encode.Encode("../../testfiles/3mb.txt", "/tmp/out")
+	err := encode.Encode("../../testfiles/small", "/tmp/out")
+	if err != nil {
+		panic(err)
+	}
+	err = encode.Decode("/tmp/out", "../../testfiles/out.txt")
+	if err != nil {
+		panic(err)
+	}
 }
